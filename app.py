@@ -17,12 +17,33 @@ if "clear_text" not in st.session_state:
 if "uploader_key" not in st.session_state:
     st.session_state.uploader_key = 0
 
+if "memory" not in st.session_state:
+    st.session_state.memory = []
+
 if st.session_state.clear_text:
     st.session_state.user_input = ""
     st.session_state.clear_text = False
 
 chat_container = st.container()
 thinking_container = st.container()
+
+
+def build_memory_context():
+    context = ""
+    for turn in st.session_state.memory:
+        context += f"User: {turn['user']}\n"
+        context += f"Assistant: {turn['assistant']}\n"
+    return context
+
+
+def update_memory(user_text, bot_text, max_turns=5):
+    st.session_state.memory.append({
+        "user": user_text,
+        "assistant": bot_text
+    })
+    if len(st.session_state.memory) > max_turns:
+        st.session_state.memory = st.session_state.memory[-max_turns:]
+
 
 with chat_container:
     for role, content in st.session_state.history:
@@ -67,10 +88,14 @@ if send and (user_input.strip() or uploaded_file):
         with thinking_container:
             ph = st.markdown("**Bot:** thinking...")
 
-        bot_reply = get_bot_response(user_input.strip())
+        memory_context = build_memory_context()
+        bot_reply = get_bot_response(
+            memory_context + f"User: {user_input.strip()}\nAssistant:"
+        )
 
         ph.empty()
         st.session_state.history.append(("assistant_text", bot_reply))
+        update_memory(user_input.strip(), bot_reply)
 
     # handle image
     if uploaded_file:
@@ -97,6 +122,7 @@ if send and (user_input.strip() or uploaded_file):
 
             ph.empty()
             st.session_state.history.append(("assistant_text", bot_reply))
+            update_memory(f"Pest detected: {label}", bot_reply)
         else:
             st.session_state.history.append(("assistant_text", "No pest detected."))
 
