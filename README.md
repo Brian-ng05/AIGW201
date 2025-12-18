@@ -77,28 +77,24 @@ This simulates tool use: the ML model acts as a “tool” guiding LLM responses
 
 ---
 
-## Installation
+## Installation & Run
 
-### Python Version
-- Python 3.12.6 (or any 3.12+)
-
-### Step 1:
+### Step 1: Clone the repository
 ```bash
 git clone https://github.com/Brian-ng05/AIGW201.git
 cd AIGW201
 ```
 
-### Step 3:
+### Step 2: Install libraries
 ```bash
 pip install -r requirements.txt
-#### Ensure worms_model.h5 is in the project root
+# Ensure worms_model.h5 is in the project root
 ```
 
-### Step 3
+### Step 3: Run the app
 ```bash
 python -m streamlit run app.py
 ```
-
 
 ## Authors
 
